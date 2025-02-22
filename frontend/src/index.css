@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body{
+    height: 100%;
+    width: 100%;
+}
+
+.msg-box{
+    scroll-behavior: smooth;
+}
+.msg-box::-webkit-scrollbar{
+    display: none;
+}
