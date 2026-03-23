@@ -16,7 +16,7 @@ const Login = () => {
       axios.post('/users/login', { email, password })
           .then((res) => {
               console.log("User Logged In:", res.data.user);
-              localStorage.setItem('token', res.data.token);
+              sessionStorage.setItem('token', res.data.token);
               setUser(res.data.user); // This will update both context and localStorage automatically
               navigate('/')
           })

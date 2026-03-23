@@ -49,21 +49,44 @@ io.on('connection', socket => {
     socket.join(socket.roomId)
 
     socket.on( 'project-message',async data=>{
-        const message=data.message;
-        const aiIsPresent=message.includes('@ai');
-        socket.broadcast.to(socket.roomId).emit('project-message', data)
-        if(aiIsPresent){
-            const prompt=message.replace('@ai','');
-            const result=await generateResult(prompt)
+        try {
+            const message=data.message;
+            const aiIsPresent=message.includes('@ai');
 
-            io.to(socket.roomId).emit('project-message',{
-                message:result,
-                sender:{
-                    _id:'ai',
-                    email:'AI'
+            const messageData = { message, sender: socket.user };
+
+            await projectModel.findByIdAndUpdate(socket.roomId, {
+                $push: { messages: messageData }
+            });
+
+            socket.broadcast.to(socket.roomId).emit('project-message', messageData)
+
+            if(aiIsPresent){
+                const prompt=message.replace('@ai','');
+                const result=await generateResult(prompt)
+
+                const aiMessage = {
+                    message: result,
+                    sender: { _id:'ai', email:'AI' }
+                };
+
+                const parsedResult = JSON.parse(result);
+                const updateData = { $push: { messages: aiMessage } };
+                if (parsedResult.fileTree) {
+                    updateData.$set = { fileTree: parsedResult.fileTree };
                 }
+
+                await projectModel.findByIdAndUpdate(socket.roomId, updateData);
+
+                io.to(socket.roomId).emit('project-message', aiMessage)
+                return
+            }
+        } catch(err) {
+            console.error('AI error:', err.message);
+            io.to(socket.roomId).emit('project-message',{
+                message: JSON.stringify({ text: `Error: ${err.message}` }),
+                sender:{ _id:'ai', email:'AI' }
             })
-            return 
         }
     })
     socket.on('disconnect', () => {

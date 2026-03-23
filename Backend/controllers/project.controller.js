@@ -29,7 +29,7 @@ export const getAllProject=async(req,res)=>{
         })
 
         const allUserprojects=await projectService.getAllProjectByUserId({
-            userId:loggedInUser
+            userId:loggedInUser._id
         })
         return res.status(200).json({
             projects:allUserprojects

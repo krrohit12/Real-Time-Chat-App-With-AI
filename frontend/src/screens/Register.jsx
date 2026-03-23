@@ -13,7 +13,7 @@ const Register = () => {
             email,password
         }).then((res)=>{
             console.log(res.data)
-            localStorage.setItem('token',res.data.token);
+            sessionStorage.setItem('token',res.data.token);
             setUser(res.data.user);
             navigate('/')
         }).catch((err)=>{

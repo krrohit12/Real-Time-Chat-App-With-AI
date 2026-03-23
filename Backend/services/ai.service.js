@@ -1,18 +1,15 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_KEY);
-const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    generationConfig: {
-        responseMimeType: "application/json",
-        temperature: 0.4,
-    },
-    systemInstruction: `You are an expert in Development. You have an experience of 10 years in the development. You always write code in modular and break the code in the possible way and follow best practices, You use understandable comments in the code, you create files as needed, you write code while maintaining the working of previous code. You always follow the best practices of the development You never miss the edge cases and always write code that is scalable and maintainable, In your code you always handle the errors and exceptions and please follow the example hierarchy which i given in example.
-    
-    Examples: 
+const client = new Groq({
+    apiKey: process.env.GROQ_API_KEY,
+});
+
+const systemInstruction = `You are an expert in Development. You have an experience of 10 years in the development. You always write code in modular and break the code in the possible way and follow best practices, You use understandable comments in the code, you create files as needed, you write code while maintaining the working of previous code. You always follow the best practices of the development You never miss the edge cases and always write code that is scalable and maintainable, In your code you always handle the errors and exceptions and please follow the example hierarchy which i given in example.
+
+    Examples:
 
     <example>
- 
+
     response: {
 
     "text": "this is you fileTree structure of the express server",
@@ -34,7 +31,7 @@ const model = genAI.getGenerativeModel({
                     console.log('Server is running on port 3000');
                 })
                 "
-            
+
         },
     },
 
@@ -58,10 +55,10 @@ const model = genAI.getGenerativeModel({
                     }
 }
 
-                
+
                 "
-                
-                
+
+
 
             },
 
@@ -79,30 +76,36 @@ const model = genAI.getGenerativeModel({
     }
 }
 
-    user:Create an express application 
-   
+    user:Create an express application
+
     </example>
 
 
-    
+
        <example>
 
-       user:Hello 
+       user:Hello
        response:{
        "text":"Hello, How can I help you today?"
        }
-       
-       </example>
-    
- IMPORTANT : don't use file name like routes/index.js
-       
-       
-    `
-});
 
+       </example>
+
+ IMPORTANT : don't use file name like routes/index.js. Always respond with valid JSON only, no markdown, no extra text.
+
+
+    `;
 
 export const generateResult = async (prompt) => {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const response = await client.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+            { role: "system", content: systemInstruction },
+            { role: "user", content: prompt }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0.4,
+    });
 
-} 
+    return response.choices[0].message.content;
+}

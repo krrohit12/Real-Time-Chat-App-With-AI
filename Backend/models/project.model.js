@@ -19,6 +19,15 @@ const projectSchema=new mongoose.Schema({
         type: Object,
         default: {}
     },
+    messages: [
+        {
+            sender: {
+                _id: String,
+                email: String,
+            },
+            message: String,
+        }
+    ],
 })
 
 const Project=mongoose.model('project',projectSchema);

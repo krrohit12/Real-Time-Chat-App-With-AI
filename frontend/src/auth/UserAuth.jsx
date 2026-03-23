@@ -6,7 +6,7 @@ const UserAuth = ({children}) => {
     // console.log(user)
     const navigate=useNavigate()
     const [loading, setloading] = useState(true)
-    const token=localStorage.getItem('token');
+    const token=sessionStorage.getItem('token');
     
     useEffect(()=>{
         if(user){

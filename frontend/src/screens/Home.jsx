@@ -6,18 +6,18 @@ import { useNavigate } from "react-router-dom";
 const Home = () => {
   const { user } = useContext(UserContext);
   const [isOpen, setisOpen] = useState(false);
-  const [projectName, setProjectName] = useState(null);
+  const [projectName, setProjectName] = useState("");
   const [project, setproject] = useState([]);
   const navigate = useNavigate();
 
   function createProject(e) {
     e.preventDefault();
-    console.log({ projectName });
 
     axios
       .post("/projects/create", { name: projectName })
       .then((res) => {
-        console.log("Project created:", res.data);
+        setproject((prev) => [...prev, res.data]);
+        setProjectName("");
         setisOpen(false);
       })
       .catch((err) => {
@@ -42,7 +42,7 @@ const Home = () => {
       await axios.get("/users/logout", {
         withCredentials: true, // Ensure cookies are sent
       });
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       navigate("/login");
     } catch (error) {
       console.error(
