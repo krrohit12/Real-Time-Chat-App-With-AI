@@ -438,6 +438,5 @@ The AI will generate complete file structures with all necessary code, and all c
 
 
 ## License
-
-
+Author: Rohit Kumar 
 This project is open source and available for educational purposes.
